@@ -9,7 +9,7 @@ def dot3(A, B, C):
     return np.dot(A, np.dot(B, C))
 
 
-def predict(x, P, F=1, Q=0, B=1, u=0):
+def predict(x, P, F=1, Q=0):
     '''
     Predict next position using the Kalman filter state propagation equations.
 
@@ -17,9 +17,6 @@ def predict(x, P, F=1, Q=0, B=1, u=0):
     @param P:numpy.array - covariance matrix
     @param F:numpy.array - state transition matrix
     @param Q:numpy.array - process noise matrix
-    @param B:numpy.array - control transition matrix
-    @param u:numpy.array - control vector. This is multiplied by B to the
-                           create the control input into the system
 
     @Returns:
         x:numpy.array - prior state vector
@@ -28,7 +25,7 @@ def predict(x, P, F=1, Q=0, B=1, u=0):
     if np.isscalar(F):
         F = np.array(F)
 
-    x = np.dot(F, x) + np.dot(B, u)
+    x = np.dot(F, x)
     P = dot3(F, P, F.T) + Q
 
     return x, P
@@ -38,17 +35,14 @@ def update(x, P, z, R, H):
     """
     Add a new measurement (z) to the Kalman filter. If z is None, nothing
     is changed.
-    This can handle either the multidimensional or unidimensional case. If
-    all parameters are floats instead of arrays the filter will still work,
-    and return floats for x, P as the result.
 
     Parameters
     ----------
     @param x:numpy.array - State estimate vector
     @param P:numpy.array - Covariance matrix
-    @param z:numpy.array - measurement for this update.
+    @param z:numpy.array - measurement for this update
     @param R:numpy.array - Measurement noise matrix
-    @param H:numpy.array - Measurement function. If not provided, a value of 1 is assumed.
+    @param H:numpy.array - Measurement conversion matrix
 
     @Returns:
         x:numpy.array - Posterior state estimate vector
